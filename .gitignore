@@ -1,0 +1,9 @@
+# IDEs:
+/.idea/
+*.DotSettings.user
+
+# Link to LogicWorld install directory:
+/LogicWorld/
+
+# CSharp:
+obj/
