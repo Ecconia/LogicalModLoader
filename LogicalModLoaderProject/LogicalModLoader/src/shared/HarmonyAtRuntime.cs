@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using LogicalModLoader.AccessHelper;
+using Types = LogicalModLoader.AccessHelper.Types;
 
 namespace LogicalModLoader
 {
@@ -20,7 +21,15 @@ namespace LogicalModLoader
 			Assembly harmonyAssembly = Assemblies.findAssemblyWithName("0Harmony");
 			harmonyType = Types.getType(harmonyAssembly, "HarmonyLib.Harmony");
 			harmonyMethodType = Types.getType(harmonyAssembly, "HarmonyLib.HarmonyMethod");
-			harmonyPatchMethod = Methods.getPublic(harmonyType, "Patch");
+			//As the client still runs on net4, use this getMethod signature:
+			harmonyPatchMethod = harmonyType.GetMethod("Patch", Bindings.publicInst, null, new Type[]
+			{
+				typeof(MethodBase),
+				harmonyMethodType,
+				harmonyMethodType,
+				harmonyMethodType,
+				harmonyMethodType,
+			}, null);
 		}
 		
 		public static object getHarmonyInstance(string name)
@@ -45,6 +54,15 @@ namespace LogicalModLoader
 			{
 				toPatchMethod, prefixMethod, postfixMethod, null, null,
 			});
+		}
+
+		public static void unpatchAll(object harmonyInstance)
+		{
+			object id = harmonyType.GetProperty("Id").GetValue(harmonyInstance);
+			harmonyType.GetMethod("UnpatchAll", Bindings.publicInst, null, new Type[]
+			{
+				typeof(string),
+			}, null).Invoke(harmonyInstance, new object[]{id});
 		}
 	}
 }
